@@ -33,13 +33,15 @@ public class EpisodeSyncWorker : BackgroundService
         }
     }
 
+
+/*
     private async Task RunOnce(CancellationToken ct)
     {
         using var scope = _sp.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<TrackerDbContext>();
 
         // 1) pagina de shows externos
-        for (int page = _opt.StartPage; ; page++)
+        for (int page = _opt.StartPage; page < _opt.StartPage + _opt.MaxPages; page++)
         {
             var shows = await _external.GetShowsAsync(page, _opt.PageSize);
             if (shows.Count == 0) break;
@@ -88,4 +90,114 @@ public class EpisodeSyncWorker : BackgroundService
             _log.LogInformation("Synced page {page} with {count} shows", page, shows.Count);
         }
     }
+
+*/
+
+private async Task RunOnce(CancellationToken ct)
+{
+    using var scope = _sp.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<TrackerDbContext>();
+
+    for (int page = _opt.StartPage;
+         page < _opt.StartPage + _opt.MaxPages;
+         page++)
+    {
+        var shows = await _external.GetShowsAsync(page, _opt.PageSize, ct);
+
+        if (shows.Count == 0)
+            break;
+
+        foreach (var item in shows)
+        {
+            var details = await _external.GetShowDetailsAsync(item.Id, ct);
+
+            if (details is null)
+                continue;
+
+            var show = await db.TvShows
+                .Include(s => s.Genres)
+                .Include(s => s.Episodes)
+                .FirstOrDefaultAsync(
+                    s => s.ExternalId == details.Id ||
+                         (s.ExternalId == null && s.Name == details.Name),
+                    ct);
+
+            if (show is null)
+            {
+                show = new TvShow
+                {
+                    ExternalId = details.Id
+                };
+
+                db.TvShows.Add(show);
+            }
+            else if (show.ExternalId is null)
+            {
+                show.ExternalId = details.Id;
+            }
+
+            show.Name = details.Name;
+            show.Summary = details.Summary;
+            show.Type = details.Type;
+            show.Status = details.Status;
+            show.Network = details.Network;
+            show.ImageUrl = details.ImageUrl;
+            show.Premiered = details.Premiered;
+            show.LastUpdated = DateTime.UtcNow;
+
+            show.Genres.Clear();
+
+            foreach (var genreName in details.Genres.Distinct())
+            {
+                var genre = await db.Genres
+                    .FirstOrDefaultAsync(g => g.Name == genreName, ct);
+
+                if (genre is null)
+                {
+                    genre = new Genre
+                    {
+                        Name = genreName
+                    };
+
+                    db.Genres.Add(genre);
+                }
+
+                show.Genres.Add(genre);
+            }
+
+            foreach (var itemEpisode in details.Episodes)
+            {
+                var episode = show.Episodes.FirstOrDefault(e =>
+                    e.Season == itemEpisode.Season &&
+                    e.Number == itemEpisode.Number);
+
+                if (episode is null)
+                {
+                    episode = new Episode
+                    {
+                        TvShow = show,
+                        Season = itemEpisode.Season,
+                        Number = itemEpisode.Number
+                    };
+
+                    show.Episodes.Add(episode);
+                }
+
+                episode.Name = itemEpisode.Name;
+                episode.AirDate = itemEpisode.AirDate;
+                episode.AirTime = itemEpisode.AirTime;
+                episode.Runtime = itemEpisode.Runtime;
+                episode.Summary = itemEpisode.Summary;
+            }
+
+            await db.SaveChangesAsync(ct);
+        }
+
+        _log.LogInformation(
+            "Synced page {page} with {count} shows",
+            page,
+            shows.Count);
+    }
+}
+
 }
