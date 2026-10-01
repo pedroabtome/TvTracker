@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TvTracker.Tests", "TvTracke
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TvTracker.Domain", "TvTracker.Domain\TvTracker.Domain.csproj", "{F250D5C1-87FF-4ED8-A09B-4848B651E256}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TvTracker.Application", "TvTracker.Application\TvTracker.Application.csproj", "{0CB057E4-7800-4F61-98F6-58F2DD222C68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TvTracker.Api", "TvTracker.Api\TvTracker.Api.csproj", "{1A4DAF25-9749-45E5-8D8F-3AED389308A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,13 @@ Global
 		{F250D5C1-87FF-4ED8-A09B-4848B651E256}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F250D5C1-87FF-4ED8-A09B-4848B651E256}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F250D5C1-87FF-4ED8-A09B-4848B651E256}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CB057E4-7800-4F61-98F6-58F2DD222C68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CB057E4-7800-4F61-98F6-58F2DD222C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CB057E4-7800-4F61-98F6-58F2DD222C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CB057E4-7800-4F61-98F6-58F2DD222C68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1A4DAF25-9749-45E5-8D8F-3AED389308A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1A4DAF25-9749-45E5-8D8F-3AED389308A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1A4DAF25-9749-45E5-8D8F-3AED389308A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1A4DAF25-9749-45E5-8D8F-3AED389308A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
