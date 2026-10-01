@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using TvTracker.Application.Shows;
 using TvTracker.Application.Shows.Dtos;
+using TvTracker.Application.Recommendations;
+using TvTracker.Application.Recommendations.Dtos;
 
 namespace TvTracker.Api.Controllers;
 
@@ -10,7 +12,15 @@ public class TvShowsController : ControllerBase
 {
     private readonly IShowService _service;
 
-    public TvShowsController(IShowService service) => _service = service;
+    private readonly IRecommendationService _recommendations;
+
+public TvShowsController(
+    IShowService service,
+    IRecommendationService recommendations)
+{
+    _service = service;
+    _recommendations = recommendations;
+}
 
     // GET /api/tvshows?genre=&type=&status=&search=&sort=name|-premiered&order=asc|desc&page=1&pageSize=20
     [HttpGet]
@@ -81,4 +91,13 @@ public class TvShowsController : ControllerBase
         var ok = await _service.ToggleFavoriteAsync(userId, showId, add: false, ct);
         return ok ? NoContent() : NotFound(); // não existia
     }
+
+    [HttpGet("~/api/me/recommendations")]
+    public async Task<ActionResult<IReadOnlyList<RecommendationDto>>> GetRecommendations([FromQuery] int limit = 10, CancellationToken ct = default)
+    {
+        const int userId = 1;
+        var items = await _recommendations.GetRecommendationsAsync(userId, limit, ct);
+        return Ok(items);
+    }
+
 }

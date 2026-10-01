@@ -5,6 +5,8 @@ using TvTracker.Infrastructure.Sync;
 using FluentValidation;
 using TvTracker.Application.Shows;
 using TvTracker.Application.Shows.Mapping;
+using TvTracker.Application.Recommendations;
+using TvTracker.Infrastructure.Recommendations;
 using TvTracker.Infrastructure.Shows;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +24,9 @@ builder.Services.AddScoped<IValidator<ListShowsQuery>, ListShowsQueryValidator>(
 
 // Serviço de shows
 builder.Services.AddScoped<IShowService, ShowService>();
+
+// Serviço de Recomendações
+builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 
 // HttpClient tipado para a API externa
 builder.Services.AddHttpClient<IExternalTvApi, ExternalTvApiClient>(client =>
